@@ -1,0 +1,45 @@
+Class my_scoreboard extends uvm_component;
+ `uvm_component_utils(my_scoreboard)
+ packet p;
+ uvm_analysis_imp #(packet,my_scoreboard) rsvd2;
+
+ function new(input string name = "socor",uvm_component c);
+ super.new(name,c);
+ endfunction
+
+ virtual function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+ rsvd2 = new("rsvd2",this);
+ endfunction
+ virtual task run_phase(uvm_phase phase);
+ super.run_phase(phase);
+ `uvm_info(get_full_name(),"scoreboard run_phase",UVM_NONE)
+ endtask
+
+ bit[3:0] que[$];
+ bit[3:0] match;
+ int count;
+
+ virtual function void write(packet p);
+ if(p.wr && p.rst == 0 && p.f_full == 0) begin
+ $display("data written at fifo is %d and count is %d",p.data_in,count);
+ que.push_back(p.data_in);
+ count = count +1;
+ end
+
+ if(p.wr== 0 && p.rst ==0 && count >0) begin
+ count = count -1;
+ match = que.pop_front();
+ $display("data read at from que is %d fifo read is %d and count is
+%d",match,p.data_out,count);
+ // @( posedge vif.clk);
+ assert(p.data_out == match) begin
+ $display("socrboard data is matching and data_in = %d data_out= %d for Nth
+write = %d",match,p.data_out,count);
+ end
+ else begin
+ $display("data not matched");
+ end
+ end
+ endfunction
+ endclass

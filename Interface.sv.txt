@@ -1,0 +1,15 @@
+interface my_interface();
+ logic clk,rst,wr,f_full,f_empty;
+ logic [3:0]data_in,data_out;
+
+
+ modport m1( input data_out,f_full,f_empty,output clk,rst,wr,data_in);
+
+
+ clocking cb @(posedge clk);
+ default input #1 output #1;
+ input data_out,f_full,f_empty;
+ output rst,wr,data_in;
+
+ endclocking
+endinterface

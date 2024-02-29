@@ -1,0 +1,39 @@
+class my_driver extends uvm_driver #(packet);
+ `uvm_component_utils(my_driver);
+ function new(input string name = "my_driver",uvm_component p);
+ super.new(name,p);
+ $display("-_- driver is created -_-");
+ endfunction
+ packet p;
+ virtual my_interface vif;
+ virtual function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+ `uvm_info(" [DRIVER] ","this is build phase",UVM_LOW)
+ if(uvm_config_db#(virtual
+my_interface)::get(this,"uvm_test_top.*","INTERFACE",vif)) begin
+ `uvm_info(" [DRIVER] ","interface handle has been recieved",UVM_LOW)
+ end
+ else
+ `uvm_error("[DRIVER]","not able to get interface handle")
+ endfunction
+
+ virtual task run_phase(uvm_phase phase);
+ super.run_phase(phase);
+ `uvm_info(" [DRIVER] ","RUN_PHASE STARTED",UVM_LOW)
+ p = packet::type_id::create("pac");
+ forever begin
+ seq_item_port.get_next_item(p);
+ @(vif.cb);
+ drive_packet();
+ @(vif.cb)
+ seq_item_port.item_done();
+ end
+ `uvm_info(" [DRIVER] ","RUN_PHASE ENDED",UVM_LOW)
+ endtask
+ task drive_packet();
+ vif.cb.wr <= p.wr;
+ vif.cb.data_in <= p.data_in;
+ vif.cb.rst <= p.rst;
+ ;
+ endtask
+ endclass

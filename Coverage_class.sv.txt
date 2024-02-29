@@ -1,0 +1,42 @@
+class my_coverage extends uvm_component;
+ `uvm_component_utils(my_coverage)
+ packet p;
+ uvm_analysis_imp #(packet,my_coverage) rsvd;
+
+ covergroup my_cover;
+ option.per_instance =1;
+ coverpoint p.rst;
+ coverpoint p.wr;
+ coverpoint p.f_full;
+ coverpoint p.f_empty;
+ coverpoint p.data_in {
+ bins b1[3] = {[0:4],[5:10],[10:15]};///for Automatic bin it will create 16 bins
+ }
+ coverpoint p.data_out{
+ bins b1[2] = {[1:8],[9:15]};
+ }
+ endgroup
+
+ function new(input string name = "my_cov",uvm_component c);
+ super.new(name,c);
+ my_cover = new();
+ endfunction
+
+ virtual function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+ rsvd = new("rsvd",this);
+ p = packet::type_id::create("packet");
+ endfunction
+
+ virtual function void write(packet c);
+ p = c;
+ // $display("packet recieved at my_coverage");
+ my_cover.sample();
+ endfunction
+
+ virtual task run_phase(uvm_phase phase);
+ super.run_phase(phase);
+
+ $display("-------------run phase of my_coverage -------- ");
+ endtask
+ endclass

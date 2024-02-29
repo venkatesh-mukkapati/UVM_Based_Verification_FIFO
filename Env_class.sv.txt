@@ -1,0 +1,28 @@
+class env extends uvm_env;
+ `uvm_component_utils(env)
+ agent age;
+ my_coverage my_cov;
+ my_scoreboard sco;
+ function new(input string name = "env", uvm_component p);
+ super.new(name,p);
+ $display("_-_ env class new function _-_");
+ endfunction
+ virtual function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+ `uvm_info(" [ENV] ","BUid Phase of ENV",UVM_LOW)
+ age = agent::type_id::create("age",this);
+ my_cov = my_coverage::type_id::create("my_cov",this);
+ sco = my_scoreboard::type_id::create("sco",this);
+ endfunction
+ virtual function void connect_phase(uvm_phase phase);
+ super.connect_phase(phase);
+ `uvm_info(" [ENV] ","connect phase of ENV",UVM_LOW)
+ age.mon.send.connect(my_cov.rsvd);
+ age.mon.send.connect(sco.rsvd2);
+ endfunction
+
+ virtual task run_phase(uvm_phase phase);
+ super.run_phase(phase);
+ `uvm_info(" [env] ","Run phase of ENV",UVM_LOW)
+ endtask
+ endclass

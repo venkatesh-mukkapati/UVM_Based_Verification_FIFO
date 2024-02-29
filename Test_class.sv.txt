@@ -1,0 +1,49 @@
+class test extends uvm_test;
+ `uvm_component_utils(test)
+ env e;
+
+ sequence_rst seq_rst;
+ sequence_wr_rd_rand seq_wr_rd_rand;
+ sequence_wr_rd_fix seq_wr_rd_fix;
+ sequence_fifo_full seq_fifo_full;
+
+ function new(input string name = "test", uvm_component p);
+ super.new(name,p);
+ $display("_-_ test class new function _-_");
+ endfunction
+ virtual function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+ `uvm_info(" [test] ","Build Phase of TEST",UVM_LOW)
+ e = env::type_id::create("env",this);
+ seq_rst = sequence_rst::type_id::create("seq");
+ seq_wr_rd_rand =sequence_wr_rd_rand::type_id::create("seq_wr_rd_rand");
+ seq_wr_rd_fix =sequence_wr_rd_fix::type_id::create("seq_wr_rd_fix");
+ seq_fifo_full =sequence_fifo_full::type_id::create("seq_fifo_full");
+
+
+ endfunction
+ virtual function void connect_phase(uvm_phase phase);
+ super.connect_phase(phase);
+ `uvm_info(" [test] ","connect phase of TEST",UVM_LOW)
+ endfunction
+
+ virtual task reset_phase(uvm_phase phase);
+ phase.raise_objection(this);
+ super.reset_phase(phase);
+ `uvm_info(" [test] ","reset phase of TEST",UVM_LOW)
+ seq_rst.start(e.age.seqr);
+ phase.drop_objection(this);
+ endtask
+
+ virtual task main_phase(uvm_phase phase);
+ phase.raise_objection(this);
+ super.run_phase(phase);
+
+ `uvm_info(" [test] ","main phase of TEST",UVM_LOW)
+ seq_wr_rd_rand.start(e.age.seqr); //all three can be run accordiny or can be
+run by creating virtual sequences
+ //seq_wr_rd_fix.start(e.age.seqr);
+ // seq_fifo_full.start(e.age.seqr);
+ phase.drop_objection(this);
+ endtask
+ endclass

@@ -1,0 +1,24 @@
+class sequence_wr_rd_fix extends uvm_sequence;//// 5 write and 5 read
+transaction
+ `uvm_object_utils(sequence_wr_rd_fix)
+ function new(input string name = "seq_wr_rd_fix");
+ super.new(name);
+ endfunction
+ packet p;
+ task body();
+
+ for(int i =0; i<15; i++) begin
+ p = packet::type_id::create("pac");
+ start_item(p);
+ if(i<5) begin
+ p.randomize() with {p.wr == 1; p.rst == 0;};
+ end
+ else begin
+ p.randomize() with {p.wr == 0; p.rst == 0;};
+ end
+ finish_item(p);
+ end
+ $display("sequence_wr_rd_fix is complete");
+ endtask
+endclass
+ 

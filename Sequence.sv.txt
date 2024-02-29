@@ -1,0 +1,17 @@
+class sequence_rst extends uvm_sequence; //reset_Sequence
+sequence
+ `uvm_object_utils(sequence_rst)
+ function new(input string name = "sequence_rst");
+ super.new(name);
+ endfunction
+ packet p;
+ task body();
+ for(int i =0; i<5; i++) begin
+ p = packet::type_id::create("pac");
+ start_item(p);
+ p.randomize() with {p.rst == 1;};
+ finish_item(p);
+ end
+ $display("--------RESET DONE-----------");
+ endtask
+endclass

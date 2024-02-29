@@ -1,0 +1,19 @@
+module tb;
+ my_interface vif();
+ always #5 vif.clk = ~vif.clk;
+ fifo #(10)
+mydut(.clk(vif.clk),.rst(vif.rst),.wr(vif.wr),.f_full(vif.f_full),.f_empty(vif.f_empty),.dat
+a_in(vif.data_in),.data_out(vif.data_out));
+ test my_test;
+ initial begin
+ vif.clk = 0;
+
+ uvm_config_db #(virtual
+my_interface)::set(null,"uvm_test_top.*","INTERFACE",vif);
+ run_test("test");
+ end
+ initial begin
+ $dumpvars;
+ $dumpfile("dump.vcd");
+ end
+ endmodule

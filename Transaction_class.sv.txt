@@ -1,0 +1,24 @@
+class packet extends uvm_sequence_item;
+ rand logic wr;
+ rand logic [7:0]data_in;
+ rand logic rst;
+ logic [7:0] data_out;
+ logic f_full;
+ logic f_empty;
+
+ `uvm_object_utils_begin(packet)
+ `uvm_field_int(wr,UVM_DEFAULT)
+ `uvm_field_int(data_in,UVM_DEFAULT)
+ `uvm_field_int(data_out,UVM_DEFAULT)
+ `uvm_field_int(rst,UVM_DEFAULT)
+ `uvm_field_int(f_empty,UVM_DEFAULT)
+ `uvm_field_int(f_full,UVM_DEFAULT)
+ `uvm_object_utils_end
+ function new(input string name ="packet");
+ super.new(name);
+ //$display("packet class is created");
+ endfunction
+ constraint my_con{
+ wr dist {1:=80,0:=40};
+ }
+endclass

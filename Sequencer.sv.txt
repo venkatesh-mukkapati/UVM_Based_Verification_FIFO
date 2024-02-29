@@ -1,0 +1,7 @@
+class my_sequencer extends uvm_sequencer #(packet);
+ `uvm_component_utils(my_sequencer)
+ function new(input string name = "my_seqr",uvm_component p);
+ super.new(name,p);
+ $display("-_- my_sequencer is created -_-");
+ endfunction
+endclass

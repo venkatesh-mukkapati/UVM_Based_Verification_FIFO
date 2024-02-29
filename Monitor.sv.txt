@@ -1,0 +1,39 @@
+class monitor extends uvm_monitor;
+ `uvm_component_utils(monitor);
+ virtual my_interface vif;
+ uvm_analysis_port#(packet) send;
+ packet p;
+ function new(input string name = "MON",uvm_component c);
+ super.new(name,c);
+ endfunction
+ virtual function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+ if(uvm_config_db #(virtual my_interface)::get(this,"*","INTERFACE",vif)) begin
+ `uvm_info(get_full_name(),"[MONITOR] interface handleis
+revieced",UVM_NONE);
+ end
+ else begin
+ `uvm_error("MONITOR", "INTERFACE HANDLE IS NOT RECIEVED")
+ end
+ send = new("analysis",this);
+ p = packet::type_id::create("pac");
+ endfunction
+ task get_data();
+ p.rst = vif.rst;
+ p.wr = vif.wr;
+ p.data_in = vif.data_in;
+ p.f_full = vif.cb.f_full;
+ p.f_empty = vif.cb.f_empty;
+ endtask
+
+ virtual task run_phase(uvm_phase phase);
+ super.run_phase(phase);
+ forever begin
+ @(vif.cb);
+ get_data();
+ @(vif.cb);
+ p.data_out = vif.cb.data_out;
+ send.write(p);
+ end
+ endtask
+ endclass

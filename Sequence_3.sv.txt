@@ -1,0 +1,16 @@
+class sequence_fifo_full extends uvm_sequence; /// sequence to make fifo full
+ `uvm_object_utils(sequence_fifo_full)
+ function new(input string name = "seq_fifo_full");
+ super.new(name);
+ endfunction
+ packet p;
+ task body();
+ for(int i =0; i<20; i++) begin
+ p = packet::type_id::create("pac");
+ start_item(p);
+ p.randomize() with {p.wr == 1; p.rst == 0;};
+ finish_item(p);
+ end
+ $display("sequence_fifo_full is complete");
+ endtask
+endclass

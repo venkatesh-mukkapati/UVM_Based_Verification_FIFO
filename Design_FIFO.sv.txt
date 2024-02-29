@@ -1,0 +1,32 @@
+module fifo #(DEPTH = 10)(clk,rst,wr,f_full,f_empty,data_in,data_out);
+ input clk,rst;
+ output f_full,f_empty;
+ input wr;
+ input [3:0] data_in;
+ output reg [3:0] data_out;
+ reg [3:0] mem[256];
+ reg [7:0] rdptr,wrptr;
+ assign f_full = (wrptr - rdptr) >= DEPTH ? 1:0;
+ assign f_empty = (wrptr - rdptr) == 0 ? 1:0;
+ always @(posedge clk) begin
+ if(rst) begin
+ for(int i= 0;i<255;i++) begin
+ mem[i] <= 0;
+ end
+ rdptr <= 0;
+ wrptr <= 0;
+ end
+ else begin
+ if(wr && !f_full) begin
+ // $display("condition is called wr && !f_full %t",$time);
+ mem[wrptr] <= data_in;
+ wrptr <= wrptr+1;
+ end
+ if(!wr && !f_empty) begin
+ // $display("condition is called !wr && !f_empty at %t",$time);
+ data_out <= mem[rdptr];
+ rdptr <= rdptr +1;
+ end
+ end
+ end
+endmodule
